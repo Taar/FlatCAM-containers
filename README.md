@@ -29,10 +29,14 @@ As of right now, there is only one graphical environment supported, X11. This is
 Run the following command and FlatCAM should start after a few seconds.
 
 ```bash
-podman run --rm -t -e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v --userns=keep-id --security-opt=label=type:container_runtime_t ghrc.io/Taar/flatcam:xserver
+podman run --rm -t -e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v --userns=keep-id --security-opt=label=type:container_runtime_t ghcr.io/taar/flatcam:xserver
 ```
 
 ### Desktop Entry
+
+> [!NOTE]
+> The first run will take a minute or two while the image is downloading. To avoid this pull the image down first.
+> `podman pull ghcr.io/taar/flatcam:xserver-573707`
 
 On Linux, create a file called, `FlatCAM.desktop` with the following within the `~/.local/share/applications/` directory.
 
@@ -51,7 +55,7 @@ Create a bash script named `FlatCAM` within the `~/.local/bin` directory with th
 
 mkdir -p "$HOME/Documents/FlatCAM/"
 
-exec podman run --rm -e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v "$HOME/Documents/FlatCAM:/home/gnuplususer/Documents/FlatCAM" --userns=keep-id --security-opt=label=type:container_runtime_t ghrc.io/Taar/flatcam:xserver-573707
+exec podman run --rm -e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v "$HOME/Documents/FlatCAM:/home/gnuplususer/Documents/FlatCAM" --userns=keep-id --security-opt=label=type:container_runtime_t ghcr.io/taar/flatcam:xserver-573707
 ```
 
 > [!NOTE]
