@@ -21,7 +21,9 @@ Since FlatCAM is a GUI application, a graphical environment is needed in order t
 
 Since a graphical environment is not packaged within these images, there might be some cases that the application will not run. If this happens, please open an issue with as much details as possible and I'll try my best to help.
 
-As of right now, there is only one graphical environment supported, X11. This is because X11 is still the most widely used graphical environment for Linux and there are ways to run X11 applications on other operating systems.
+As of right now, X11 and wayland graphical environments supported. I recommend trying the X11 tag first.
+
+### X11/XWayland
 
 > [!NOTE]
 > *Most* wayland compositors support xwayland which is used to support legacy X11 applications. [xwayland-satellite](https://github.com/Supreeeme/xwayland-satellite) can be used if xwayland isn't started automatically by the wayland compositor.
@@ -29,10 +31,18 @@ As of right now, there is only one graphical environment supported, X11. This is
 Run the following command and FlatCAM should start after a few seconds.
 
 ```bash
-podman run --rm -t -e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v --userns=keep-id --security-opt=label=type:container_runtime_t ghcr.io/taar/flatcam:xserver
+podman run --rm -t -e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v "$HOME/Documents/FlatCAM:/home/gnuplususer/Documents/FlatCAM" --userns=keep-id --security-opt=label=type:container_runtime_t ghcr.io/taar/flatcam:xserver
 ```
 
-### Desktop Entry
+### Wayland
+
+Run the following command and FlatCAM should start after a few seconds.
+
+```bash
+podman run --rm -t -v "$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY:/tmp/$WAYLAND_DISPLAY" -v "$HOME/Documents/FlatCAM:/home/gnuplususer/Documents/FlatCAM" --device=/dev/dri --userns=keep-id --security-opt=label=type:container_runtime_t ghcr.io/taar/flatcam:wayland
+```
+
+## Desktop Entry
 
 > [!NOTE]
 > The first run will take a minute or two while the image is downloading. To avoid this pull the image down first.
@@ -65,16 +75,20 @@ exec podman run --rm -e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v "$HOME/Docum
 ## Building the Images
 
 ```bash
+# Build X11 image
 podman build . --target xserver -t flatcam:xserver
+# Build wayland image
+podman build . --target xserver -t flatcam:wayland
 ```
 
 ### Available Tags
 
 - `latest`, `xserver`, `xserver-573707`
+- `wayland`, `wayland-573707`
 
 ## Roadmap
 
-- [ ] Image flavour with support for wayland compositors without using xwayland
+- [x] Image flavour with support for wayland compositors without using xwayland
   - Qt 6 has wayland support afaik
 - [ ] Image flavour for external access using VNC
   - Configure a basic wlroots based compositor and setup [wayvnc](https://github.com/any1/wayvnc)

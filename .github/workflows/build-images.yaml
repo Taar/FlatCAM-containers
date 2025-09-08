@@ -15,12 +15,35 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v5
 
-      - name: Buildah Build
+      - name: Buildah Build X11
         id: build-image
         uses: redhat-actions/buildah-build@v2
         with:
           image: flatcam
           tags: latest xserver xserver-573707
+          containerfiles: |
+            ./Containerfile
+          context: .
+          oci: true
+          extra-args: |
+            --target xserver
+
+      - name: Push Github Repository
+        id: push-to-ghcr
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-image.outputs.image }}
+          tags: ${{ steps.build-image.outputs.tags }}
+          registry: ghcr.io/taar
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Buildah Build Wayland
+        id: build-image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: flatcam
+          tags: wayland wayland-573707
           containerfiles: |
             ./Containerfile
           context: .
